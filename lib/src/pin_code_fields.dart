@@ -183,12 +183,6 @@ class PinCodeTextField extends StatefulWidget {
   /// Height of the cursor, default to FontSize + 8;
   final double? cursorHeight;
 
-  /// Autofill cleanup action
-  final AutofillContextAction onAutoFillDisposeAction;
-
-  /// Use external [AutoFillGroup]
-  final bool useExternalAutoFillGroup;
-
   /// Displays a hint or placeholder in the field if it's value is empty.
   /// It only appears if it's not null. Single character is recommended.
   final String? hintCharacter;
@@ -271,12 +265,6 @@ class PinCodeTextField extends StatefulWidget {
     this.textGradient,
     this.readOnly = false,
     this.autoUnfocus = true,
-
-    /// Default for [AutofillGroup]
-    this.onAutoFillDisposeAction = AutofillContextAction.commit,
-
-    /// Default create internal [AutofillGroup]
-    this.useExternalAutoFillGroup = false,
     this.scrollPadding = const EdgeInsets.all(20),
     this.separatorBuilder,
   })  : assert(obscuringCharacter.isNotEmpty),
@@ -286,8 +274,7 @@ class PinCodeTextField extends StatefulWidget {
   _PinCodeTextFieldState createState() => _PinCodeTextFieldState();
 }
 
-class _PinCodeTextFieldState extends State<PinCodeTextField>
-    with TickerProviderStateMixin {
+class _PinCodeTextFieldState extends State<PinCodeTextField> with TickerProviderStateMixin {
   TextEditingController? _textEditingController;
   FocusNode? _focusNode;
   late List<String> _inputList;
@@ -309,6 +296,7 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
   late Animation<Offset> _offsetAnimation;
 
   late Animation<double> _cursorAnimation;
+
   DialogConfig get _dialogConfig => widget.dialogConfig == null
       ? DialogConfig()
       : DialogConfig(
@@ -317,6 +305,7 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
           dialogTitle: widget.dialogConfig!.dialogTitle,
           negativeText: widget.dialogConfig!.negativeText,
         );
+
   PinTheme get _pinTheme => widget.pinTheme;
 
   Timer? _blinkDebounce;
@@ -356,8 +345,7 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
 
     _hasBlinked = true;
 
-    _cursorController = AnimationController(
-        duration: Duration(milliseconds: 1000), vsync: this);
+    _cursorController = AnimationController(duration: Duration(milliseconds: 1000), vsync: this);
     _cursorAnimation = Tween<double>(
       begin: 1,
       end: 0,
@@ -397,8 +385,7 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
       });
     }
     // If a default value is set in the TextEditingController, then set to UI
-    if (_textEditingController!.text.isNotEmpty)
-      _setTextToInput(_textEditingController!.text);
+    if (_textEditingController!.text.isNotEmpty) _setTextToInput(_textEditingController!.text);
   }
 
   // validating all the values
@@ -407,14 +394,10 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
     assert(_pinTheme.fieldHeight > 0);
     assert(_pinTheme.fieldWidth > 0);
     assert(_pinTheme.borderWidth >= 0);
-    assert(_dialogConfig.affirmativeText != null &&
-        _dialogConfig.affirmativeText!.isNotEmpty);
-    assert(_dialogConfig.negativeText != null &&
-        _dialogConfig.negativeText!.isNotEmpty);
-    assert(_dialogConfig.dialogTitle != null &&
-        _dialogConfig.dialogTitle!.isNotEmpty);
-    assert(_dialogConfig.dialogContent != null &&
-        _dialogConfig.dialogContent!.isNotEmpty);
+    assert(_dialogConfig.affirmativeText != null && _dialogConfig.affirmativeText!.isNotEmpty);
+    assert(_dialogConfig.negativeText != null && _dialogConfig.negativeText!.isNotEmpty);
+    assert(_dialogConfig.dialogTitle != null && _dialogConfig.dialogTitle!.isNotEmpty);
+    assert(_dialogConfig.dialogContent != null && _dialogConfig.dialogContent!.isNotEmpty);
   }
 
   runHapticFeedback() {
@@ -446,7 +429,7 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
 
   // Assigning the text controller, if empty assigning a new one.
   void _assignController() {
-      _textEditingController =  widget.controller ?? TextEditingController();
+    _textEditingController = widget.controller ?? TextEditingController();
 
     _textEditingController?.addListener(() {
       if (widget.useHapticFeedback) {
@@ -469,8 +452,7 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
               currentText = currentText.substring(0, widget.length);
             }
             //  delay the onComplete event handler to give the onChange event handler enough time to complete
-            Future.delayed(Duration(milliseconds: 300),
-                () => widget.onCompleted!(currentText));
+            Future.delayed(Duration(milliseconds: 300), () => widget.onCompleted!(currentText));
           }
 
           if (widget.autoDismissKeyboard) _focusNode!.unfocus();
@@ -486,8 +468,7 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
     // set has blinked to false and back to true
     // after duration
     if (widget.blinkWhenObscuring &&
-        _textEditingController!.text.length >
-            _inputList.where((x) => x.isNotEmpty).length) {
+        _textEditingController!.text.length > _inputList.where((x) => x.isNotEmpty).length) {
       _setState(() {
         _hasBlinked = false;
       });
@@ -578,10 +559,9 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
       );
     }
 
-    final text =
-        widget.obscureText && _inputList[index].isNotEmpty && showObscured
-            ? widget.obscuringCharacter
-            : _inputList[index];
+    final text = widget.obscureText && _inputList[index].isNotEmpty && showObscured
+        ? widget.obscuringCharacter
+        : _inputList[index];
     return widget.textGradient != null
         ? Gradiented(
             gradient: widget.textGradient!,
@@ -668,9 +648,8 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
   }
 
   Future<void> _showPasteDialog(String pastedText) {
-    final formattedPastedText = pastedText
-        .trim()
-        .substring(0, min(pastedText.trim().length, widget.length));
+    final formattedPastedText =
+        pastedText.trim().substring(0, min(pastedText.trim().length, widget.length));
 
     final defaultPastedTextStyle = TextStyle(
       fontWeight: FontWeight.bold,
@@ -713,8 +692,7 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
               content: RichText(
                 text: TextSpan(
                   text: _dialogConfig.dialogContent,
-                  style: TextStyle(
-                      color: Theme.of(context).textTheme.button!.color),
+                  style: TextStyle(color: Theme.of(context).textTheme.button!.color),
                   children: [
                     TextSpan(
                       text: formattedPastedText,
@@ -736,67 +714,11 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
 
   @override
   Widget build(BuildContext context) {
-    Directionality textField = Directionality(
-      textDirection: widget.errorTextDirection,
-      child: Padding(
-        padding: widget.errorTextMargin,
-        child: TextFormField(
-          textInputAction: widget.textInputAction,
-          controller: _textEditingController,
-          focusNode: _focusNode,
-          enabled: widget.enabled,
-          autofillHints: widget.enablePinAutofill && widget.enabled
-              ? <String>[AutofillHints.oneTimeCode]
-              : null,
-          autofocus: widget.autoFocus,
-          autocorrect: false,
-          keyboardType: widget.keyboardType,
-          keyboardAppearance: widget.keyboardAppearance,
-          textCapitalization: widget.textCapitalization,
-          validator: widget.validator,
-          onSaved: widget.onSaved,
-          autovalidateMode: widget.autovalidateMode,
-          inputFormatters: [
-            ...widget.inputFormatters,
-            LengthLimitingTextInputFormatter(
-              widget.length,
-            ), // this limits the input length
-          ],
-          // trigger on the complete event handler from the keyboard
-          onFieldSubmitted: widget.onSubmitted,
-          onEditingComplete: widget.onEditingComplete,
-          enableInteractiveSelection: false,
-          showCursor: false,
-          // using same as background color so tha it can blend into the view
-          cursorWidth: 0.01,
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.all(0),
-            border: InputBorder.none,
-            fillColor: widget.backgroundColor,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            disabledBorder: InputBorder.none,
-          ),
-          style: TextStyle(
-            color: Colors.transparent,
-            height: .01,
-            fontSize: kIsWeb
-                ? 1
-                : 0.01, // it is a hidden textfield which should remain transparent and extremely small
-          ),
-          scrollPadding: widget.scrollPadding,
-          readOnly: widget.readOnly,
-          obscureText: widget.obscureText,
-        ),
-      ),
-    );
-
     return SlideTransition(
       position: _offsetAnimation,
       child: Container(
         // adding the extra space at the bottom to show the error text from validator
-        height: (widget.autovalidateMode == AutovalidateMode.disabled &&
-                widget.validator == null)
+        height: (widget.autovalidateMode == AutovalidateMode.disabled && widget.validator == null)
             ? widget.pinTheme.fieldHeight
             : widget.pinTheme.fieldHeight + widget.errorTextSpace,
         color: widget.backgroundColor,
@@ -806,12 +728,60 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
             AbsorbPointer(
               // this is a hidden textfield under the pin code fields.
               absorbing: true, // it prevents on tap on the text field
-              child: widget.useExternalAutoFillGroup
-                  ? textField
-                  : AutofillGroup(
-                      onDisposeAction: widget.onAutoFillDisposeAction,
-                      child: textField,
+              child: Directionality(
+                textDirection: widget.errorTextDirection,
+                child: Padding(
+                  padding: widget.errorTextMargin,
+                  child: TextFormField(
+                    textInputAction: widget.textInputAction,
+                    controller: _textEditingController,
+                    focusNode: _focusNode,
+                    enabled: widget.enabled,
+                    autofillHints: widget.enablePinAutofill && widget.enabled
+                        ? <String>[AutofillHints.oneTimeCode]
+                        : null,
+                    autofocus: widget.autoFocus,
+                    autocorrect: false,
+                    keyboardType: widget.keyboardType,
+                    keyboardAppearance: widget.keyboardAppearance,
+                    textCapitalization: widget.textCapitalization,
+                    validator: widget.validator,
+                    onSaved: widget.onSaved,
+                    autovalidateMode: widget.autovalidateMode,
+                    inputFormatters: [
+                      ...widget.inputFormatters,
+                      LengthLimitingTextInputFormatter(
+                        widget.length,
+                      ), // this limits the input length
+                    ],
+                    // trigger on the complete event handler from the keyboard
+                    onFieldSubmitted: widget.onSubmitted,
+                    onEditingComplete: widget.onEditingComplete,
+                    enableInteractiveSelection: false,
+                    showCursor: false,
+                    // using same as background color so tha it can blend into the view
+                    cursorWidth: 0.01,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.all(0),
+                      border: InputBorder.none,
+                      fillColor: widget.backgroundColor,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
                     ),
+                    style: TextStyle(
+                      color: Colors.transparent,
+                      height: .01,
+                      fontSize: kIsWeb
+                          ? 1
+                          : 0.01, // it is a hidden textfield which should remain transparent and extremely small
+                    ),
+                    scrollPadding: widget.scrollPadding,
+                    readOnly: widget.readOnly,
+                    obscureText: widget.obscureText,
+                  ),
+                ),
+              ),
             ),
             Positioned(
               top: 0,
@@ -860,13 +830,11 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
               width: _pinTheme.fieldWidth,
               height: _pinTheme.fieldHeight,
               decoration: BoxDecoration(
-                color: widget.enableActiveFill
-                    ? _getFillColorFromIndex(i)
-                    : Colors.transparent,
-                boxShadow: (_pinTheme.activeBoxShadows != null ||
-                        _pinTheme.inActiveBoxShadows != null)
-                    ? _getBoxShadowFromIndex(i)
-                    : widget.boxShadows,
+                color: widget.enableActiveFill ? _getFillColorFromIndex(i) : Colors.transparent,
+                boxShadow:
+                    (_pinTheme.activeBoxShadows != null || _pinTheme.inActiveBoxShadows != null)
+                        ? _getBoxShadowFromIndex(i)
+                        : widget.boxShadows,
                 shape: _pinTheme.shape == PinCodeFieldShape.circle
                     ? BoxShape.circle
                     : BoxShape.rectangle,
@@ -925,11 +893,9 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
 
   void _onFocus() {
     if (widget.autoUnfocus) {
-      if (_focusNode!.hasFocus &&
-          MediaQuery.of(widget.appContext).viewInsets.bottom == 0) {
+      if (_focusNode!.hasFocus && MediaQuery.of(widget.appContext).viewInsets.bottom == 0) {
         _focusNode!.unfocus();
-        Future.delayed(
-            const Duration(microseconds: 1), () => _focusNode!.requestFocus());
+        Future.delayed(const Duration(microseconds: 1), () => _focusNode!.requestFocus());
       } else {
         _focusNode!.requestFocus();
       }
